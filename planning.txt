@@ -1,0 +1,33 @@
+Requirements:
+
+- No eval()
+- no newFunction() evaluating a string.
+
+- functions for:
+    - add
+    - subtract
+    - multiply
+    - divide
+- number1, operator, number2 variables.
+- function operate(number1, operator, number2)
+    - calls function for add / subtract etc.
+- HTML calculator with:
+    - 0-9, +-*/, =, clear
+    - display
+- functions (eventListeners) to populate display when clicking number buttons.
+    - store 'display value' in a variable.
+- function to evaluate and update display when clicking equals.
+
+Extras to think about:
+- Implement series of operators, e.g. 12 + 7 - 5 * 3 = 42
+    - Erm... that is wrong? But yes that is also the way these simple calculators work.
+- Round answers with long decimals to avoid overflow.
+- Make sure '=' has error checking.
+- Make sure 'clear' wipes out all data.
+- If divide by 0, display an error message.
+
+Expansions:
+- Add decimals. Disable decimal button if the display has a decimal already.
+- Add nice CSS.
+- Add a backspace button.
+- Add keyboard support.
