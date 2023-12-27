@@ -89,12 +89,38 @@ btnDecimal.addEventListener('click', function() {
 function updateDisplay(newValue, updateText) {
     // TODO: implement length checking here.
     // Convert length value to a string of maximum MAX_LENGTH characters.
-    // Cases to deal with: 100,000,000 or greater.
-    // 
+    
+    // Deal with case > MAX_DISPLAY value allows.
+    // If number reaches more than MAX_DISPLAY digits, show the result
+    // in scientific notation and disable all buttons except "clear".
     if (parseFloat(newValue) > 10 ** MAX_DISPLAY - 1) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
+    } else {
+        // Deal with rounding.
+        /*
+        Convert to string
+        If it has a decimal point
+            Split into before and after
+            Length of lenBefore and lenAfter
+            parseFloat(num).toFixed(Math.min(MAX_LENGTH - lenBefore, lenAfter))
+        */
+        newValue = '' + newValue;
+        const re = /^[0-9]+.{1}[0-9]+$/;
+        if (re.test(newValue)) {
+            let decimalArray = newValue.split(".");
+            beforeDecimal = decimalArray[0];
+            afterDecimal = decimalArray[1];
+            
+            let lenBefore = 0;
+            let lenAfter = 0;
+            
+            lenBefore = beforeDecimal.length;
+            lenAfter = afterDecimal.length;
+            newValue = parseFloat(newValue).toFixed(Math.min(MAX_DISPLAY - lenBefore, lenAfter));
+        }
     }
+
     displayValue = '' + newValue;
 
     if (updateText == true) {
