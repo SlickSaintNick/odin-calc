@@ -19,7 +19,7 @@ btnNumbers.forEach ((btn) => {
         equalsLastPressed = false;
         console.log(typeof displayValue);
         console.log(displayValue);
-        if (displayValue.replaceAll('.', '').replaceAll('-', '').length < MAX_DISPLAY) {
+        if (displayValue.replaceAll('-', '').length < MAX_DISPLAY) {
             updateDisplay(displayValue + btn.value, true);
         }
     });
@@ -79,8 +79,8 @@ btnPercent.addEventListener('click', () => {
 })
 
 
-const btnSign = document.querySelector("button.sign");
-btnSign.addEventListener('click', () => {
+const btnToggleSign = document.querySelector("button.toggle-sign");
+btnToggleSign.addEventListener('click', () => {
     if (displayValue !== 0 && displayValue !== '') {
         updateDisplay((parseFloat(displayValue) * -1), true);
     }
@@ -105,7 +105,7 @@ function updateDisplay(newValue, updateText) {
     if (Math.abs(parseFloat(newValue)) > 10 ** MAX_DISPLAY - 1) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
-    } else if (Math.abs(parseFloat(newValue)) < 10 ** (-MAX_DISPLAY + 1) && Math.abs(parseFloat(newValue)) > 0) {
+    } else if (Math.abs(parseFloat(newValue)) < 10 ** ((-1 * MAX_DISPLAY) + 2) && Math.abs(parseFloat(newValue)) > 0) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
     } else {
