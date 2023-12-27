@@ -12,8 +12,11 @@ btnNumbers.forEach ((btn) => {
     btn.addEventListener('click', () => {
         // When a number is clicked, add it to the display variable and update the display.
         // If the displayValue string is already at maximum size, do nothing.
+        if (equalsLastPressed == true) updateDisplay('', true);
         equalsLastPressed = false;
-        if (displayValue.length < MAX_DISPLAY) {
+        console.log(typeof displayValue);
+        console.log(displayValue);
+        if (displayValue.replaceAll('.', '').length < MAX_DISPLAY) {
             updateDisplay(displayValue + btn.value, true);
         }
     });
@@ -37,8 +40,8 @@ btnOperators.forEach ((btn) => {
 const btnEquals = document.querySelector("button.equals");
 btnEquals.addEventListener('click', () => {
     // When equals is clicked, store the current display as secondNumber.
-    // Operate on the numbers and store the result in firstNumber.
-    // Toggle 'equalsLastPressed' to allow repeated presses of equals.
+    // Operate on the numbers, update the display and store the result in firstNumber.
+    // Toggle 'equalsLastPressed' to allow repeated presses of equals with repeated operation.
     if (!equalsLastPressed) {
         secondNumber = displayValue;
         firstNumber = updateDisplay(operate(firstNumber, operator, secondNumber), true);
@@ -50,8 +53,6 @@ btnEquals.addEventListener('click', () => {
         firstNumber = updateDisplay(operate(firstNumber, equalsCacheOperator, equalsCacheSecondNumber), true);
     }
     equalsLastPressed = true;
-    
-    
 });
 
 
@@ -66,13 +67,20 @@ btnClear.addEventListener('click', () => {
 
 const btnPercent = document.querySelector("button.percent");
 btnPercent.addEventListener('click', () => {
-    updateDisplay(Math.floor((parseFloat(displayValue) / 100)), true);
+    updateDisplay((Math.round((parseFloat(displayValue) / 100) * 100) / 100), true);
 })
 
 
+const btnDecimal = document.querySelector("button.decimal");
+btnDecimal.addEventListener('click', function() {
+    if (!displayValue.includes(".") && displayValue.length < MAX_DISPLAY - 1) {
+        updateDisplay(displayValue + this.value, true);
+    }
+})
+
 function updateDisplay(newValue, updateText) {
     // TODO: implement length checking here.
-    displayValue = newValue;
+    displayValue = '' + newValue;
     if (updateText == true) {
         display.innerText = (displayValue == '' ? 0 : displayValue);
     }
