@@ -1,12 +1,11 @@
 let firstNumber = '';
 let secondNumber = '';
 let operator = '';
-let displayValue = '0';
+let displayValue = '';
 let equalsLastPressed = false;
 
 const MAX_DISPLAY = 8;
 const display = document.querySelector(".display")
-display.innerText = displayValue;
 
 const btnNumbers = document.querySelectorAll("button.number");
 btnNumbers.forEach ((btn) => {
@@ -61,7 +60,7 @@ btnClear.addEventListener('click', () => {
     firstNumber = '';
     secondNumber = '';
     operator = '';
-    updateDisplay('0', true);
+    updateDisplay('', true);
 })
 
 
