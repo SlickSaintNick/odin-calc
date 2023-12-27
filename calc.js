@@ -2,11 +2,13 @@ let firstNumber = '';
 let secondNumber = '';
 let operator = '';
 let displayValue = '';
+let signValue = '';
 let equalsLastPressed = false;
 
 
 const MAX_DISPLAY = 8;
 const display = document.querySelector(".display");
+const sign = document.querySelector(".sign");
 const buttonsNotClear = document.querySelectorAll("button:not(.clear)");
 
 const btnNumbers = document.querySelectorAll("button.number");
@@ -18,7 +20,7 @@ btnNumbers.forEach ((btn) => {
         equalsLastPressed = false;
         console.log(typeof displayValue);
         console.log(displayValue);
-        if (displayValue.replaceAll('.', '').length < MAX_DISPLAY) {
+        if (displayValue.replaceAll('.', '').replaceAll('-', '').length < MAX_DISPLAY) {
             updateDisplay(displayValue + btn.value, true);
         }
     });
@@ -81,7 +83,10 @@ btnPercent.addEventListener('click', () => {
 
 const btnSign = document.querySelector("button.sign");
 btnSign.addEventListener('click', () => {
-    updateDisplay((parseFloat(displayValue) * -1), true);
+    if (displayValue !== 0 && displayValue !== '') {
+        updateDisplay((parseFloat(displayValue) * -1), true);
+    }
+    
 })
 
 
@@ -99,7 +104,10 @@ function updateDisplay(newValue, updateText) {
     // Deal with very long integers.
     // If number reaches more than MAX_DISPLAY digits, show the result
     // in scientific notation and disable all buttons except "clear".
-    if (parseFloat(newValue) > 10 ** MAX_DISPLAY - 1) {
+    if (Math.abs(parseFloat(newValue)) > 10 ** MAX_DISPLAY - 1) {
+        newValue = newValue.toExponential(MAX_DISPLAY - 5);
+        buttonsNotClear.forEach((button) => button.disabled = true);
+    } else if (Math.abs(parseFloat(newValue)) < 0.0000001 && Math.abs(parseFloat(newValue)) > 0) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
     } else {
@@ -108,7 +116,7 @@ function updateDisplay(newValue, updateText) {
         // of digits in the display, or the current number of digits, whichever
         // is smaller.
         newValue = '' + newValue;
-        const re = /^[0-9]+\.[0-9]+$/;
+        const re = /^-?[0-9]+\.[0-9]+$/;
         if (re.test(newValue)) {
             let decimalArray = newValue.split(".");
             let beforeDecimal = decimalArray[0];
@@ -127,8 +135,14 @@ function updateDisplay(newValue, updateText) {
 
     // If required, update the display to reflect the new value.
     if (updateText == true) {
-        //TODO: add minus box and minus handling so always 8 digits.
-        display.innerText = (displayValue == '' ? 0 : displayValue);
+        // Handle negative values, without changing the variable displayValue.
+        if (displayValue.startsWith('-')) {
+            sign.innerText = "-";
+            display.innerText = displayValue.slice(1, );
+        } else {
+            sign.innerText = "";
+            display.innerText = (displayValue == '' || displayValue == 'NaN' || displayValue == 'undefined' ? 0 : displayValue);
+        }
     }
     return displayValue;
 }
@@ -169,5 +183,5 @@ function multiply(a, b) {
 
 
 function divide(a, b) {
-    return (b !== 0) ? parseFloat(a) / parseFloat(b) : "DIV 0!";
+    return (b !== '0') ? parseFloat(a) / parseFloat(b) : "♾";
 }
