@@ -1,51 +1,102 @@
 let firstNumber = '';
 let secondNumber = '';
 let operator = '';
-let displayValue = '';
+let displayValue = '0';
+let equalsLastPressed = false;
 
-let display = document.querySelector(".display")
+const MAX_DISPLAY = 8;
+const display = document.querySelector(".display")
+display.innerText = displayValue;
 
-let btnNumbers = document.querySelectorAll("button.number");
+const btnNumbers = document.querySelectorAll("button.number");
 btnNumbers.forEach ((btn) => {
     btn.addEventListener('click', () => {
-        console.log(btn.value);
-        displayValue += btn.value;
-        updateDisplay();
+        // When a number is clicked, add it to the display variable and update the display.
+        // If the displayValue string is already at maximum size, do nothing.
+        equalsLastPressed = false;
+        if (displayValue.length < MAX_DISPLAY) {
+            updateDisplay(displayValue + btn.value, true);
+        }
     });
 });
 
-let btnOperators = document.querySelectorAll("button.operator");
+
+const btnOperators = document.querySelectorAll("button.operator");
 btnOperators.forEach ((btn) => {
     btn.addEventListener('click', () => {
+        // When an operator is clicked, store the display in firstNumber and store the operator.
+        // Clear the displayValue string but do not update the display itself yet, so the
+        // user can see what value is being used for firstNumber.
+        equalsLastPressed = false;
         firstNumber = displayValue;
         operator = btn.value;
-        displayValue = '';
+        updateDisplay('', false);
     });
 });
 
-let btnEquals = document.querySelector("button.equals");
+
+const btnEquals = document.querySelector("button.equals");
 btnEquals.addEventListener('click', () => {
-    secondNumber = displayValue;
-    firstNumber = operate(firstNumber, operator, secondNumber);
-    secondNumber = '';
-    operator = '';
-    displayValue = firstNumber;
-    updateDisplay();
+    // When equals is clicked, store the current display as secondNumber.
+    // Operate on the numbers and store the result in firstNumber.
+    // Toggle 'equalsLastPressed' to allow repeated presses of equals.
+    if (!equalsLastPressed) {
+        secondNumber = displayValue;
+        firstNumber = updateDisplay(operate(firstNumber, operator, secondNumber), true);
+        equalsCacheSecondNumber = secondNumber;
+        equalsCacheOperator = operator;
+        secondNumber = '';
+        operator = '';
+    } else {
+        firstNumber = updateDisplay(operate(firstNumber, equalsCacheOperator, equalsCacheSecondNumber), true);
+    }
+    equalsLastPressed = true;
+    
+    
 });
 
-let btnClear = document.querySelector("button.clear");
+
+const btnClear = document.querySelector("button.clear");
 btnClear.addEventListener('click', () => {
     firstNumber = '';
     secondNumber = '';
     operator = '';
-    displayValue = '';
-    updateDisplay();
+    updateDisplay('0', true);
 })
 
-function updateDisplay() {
-    display.innerText = (displayValue == '' ? 0 : displayValue);
+
+const btnPercent = document.querySelector("button.percent");
+btnPercent.addEventListener('click', () => {
+    updateDisplay(Math.floor((parseFloat(displayValue) / 100)), true);
+})
+
+
+function updateDisplay(newValue, updateText) {
+    // TODO: implement length checking here.
+    displayValue = newValue;
+    if (updateText == true) {
+        display.innerText = (displayValue == '' ? 0 : displayValue);
+    }
+    return displayValue;
 }
 
+
+function operate(a, op, b) {
+    switch(op) {
+        case '+':
+            return add(a, b);
+        case '-':
+            return subtract(a, b);
+        case '*':
+            return multiply(a, b);
+        case '/':
+            return divide(a, b);
+        case '':
+            return a;
+        default:
+            return a;
+    }
+}
 
 function add(a, b) {
     return parseFloat(a) + parseFloat(b);
@@ -65,19 +116,3 @@ function multiply(a, b) {
 function divide(a, b) {
     return (b !== 0) ? parseFloat(a) / parseFloat(b) : "DIV 0!";
 }
-
-function operate(a, op, b) {
-    switch(op) {
-        case '+':
-            return add(a, b);
-        case '-':
-            return subtract(a, b);
-        case '*':
-            return multiply(a, b);
-        case '/':
-            return divide(a, b);
-        default:
-            return a;
-    }
-}
-
