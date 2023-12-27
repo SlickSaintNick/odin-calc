@@ -5,7 +5,6 @@ let displayValue = '';
 let signValue = '';
 let equalsLastPressed = false;
 
-
 const MAX_DISPLAY = 8;
 const display = document.querySelector(".display");
 const sign = document.querySelector(".sign");
@@ -76,7 +75,6 @@ const btnPercent = document.querySelector("button.percent");
 btnPercent.addEventListener('click', () => {
     // Convert the number from a % to a decimal, i.e. divide by 100 and round to
     // 2 dp.
-    // TODO: Change this to match the usual function on a calculator like this.
     updateDisplay((Math.round((parseFloat(displayValue) / 100) * 100) / 100), true);
 })
 
@@ -107,7 +105,7 @@ function updateDisplay(newValue, updateText) {
     if (Math.abs(parseFloat(newValue)) > 10 ** MAX_DISPLAY - 1) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
-    } else if (Math.abs(parseFloat(newValue)) < 0.0000001 && Math.abs(parseFloat(newValue)) > 0) {
+    } else if (Math.abs(parseFloat(newValue)) < 10 ** (-MAX_DISPLAY + 1) && Math.abs(parseFloat(newValue)) > 0) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
     } else {
