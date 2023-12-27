@@ -4,8 +4,10 @@ let operator = '';
 let displayValue = '';
 let equalsLastPressed = false;
 
+
 const MAX_DISPLAY = 8;
-const display = document.querySelector(".display")
+const display = document.querySelector(".display");
+const buttonsNotClear = document.querySelectorAll("button:not(.clear)");
 
 const btnNumbers = document.querySelectorAll("button.number");
 btnNumbers.forEach ((btn) => {
@@ -58,21 +60,27 @@ btnEquals.addEventListener('click', () => {
 
 const btnClear = document.querySelector("button.clear");
 btnClear.addEventListener('click', () => {
+    // Reset all numbers and clear display
     firstNumber = '';
     secondNumber = '';
     operator = '';
+    buttonsNotClear.forEach((button) => button.disabled = false);
     updateDisplay('', true);
 })
 
 
 const btnPercent = document.querySelector("button.percent");
 btnPercent.addEventListener('click', () => {
+    // Convert the number from a % to a decimal, i.e. divide by 100 and round to
+    // 2 dp.
+    // TODO: Change this to match the usual function on a calculator like this.
     updateDisplay((Math.round((parseFloat(displayValue) / 100) * 100) / 100), true);
 })
 
 
 const btnDecimal = document.querySelector("button.decimal");
 btnDecimal.addEventListener('click', function() {
+    // If the display doesn't already include a '.', and isn't too long, add a decimal point.
     if (!displayValue.includes(".") && displayValue.length < MAX_DISPLAY - 1) {
         updateDisplay(displayValue + this.value, true);
     }
@@ -80,7 +88,15 @@ btnDecimal.addEventListener('click', function() {
 
 function updateDisplay(newValue, updateText) {
     // TODO: implement length checking here.
+    // Convert length value to a string of maximum MAX_LENGTH characters.
+    // Cases to deal with: 100,000,000 or greater.
+    // 
+    if (parseFloat(newValue) > 10 ** MAX_DISPLAY - 1) {
+        newValue = newValue.toExponential(MAX_DISPLAY - 5);
+        buttonsNotClear.forEach((button) => button.disabled = true);
+    }
     displayValue = '' + newValue;
+
     if (updateText == true) {
         display.innerText = (displayValue == '' ? 0 : displayValue);
     }
