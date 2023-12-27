@@ -45,6 +45,7 @@ btnEquals.addEventListener('click', () => {
     // Operate on the numbers, update the display and store the result in firstNumber.
     // Toggle 'equalsLastPressed' to allow repeated presses of equals with repeated operation.
     if (!equalsLastPressed) {
+        if (firstNumber == '') firstNumber = displayValue;
         secondNumber = displayValue;
         firstNumber = updateDisplay(operate(firstNumber, operator, secondNumber), true);
         equalsCacheSecondNumber = secondNumber;
@@ -78,6 +79,12 @@ btnPercent.addEventListener('click', () => {
 })
 
 
+const btnSign = document.querySelector("button.sign");
+btnSign.addEventListener('click', () => {
+    updateDisplay((parseFloat(displayValue) * -1), true);
+})
+
+
 const btnDecimal = document.querySelector("button.decimal");
 btnDecimal.addEventListener('click', function() {
     // If the display doesn't already include a '.', and isn't too long, add a decimal point.
@@ -87,10 +94,9 @@ btnDecimal.addEventListener('click', function() {
 })
 
 function updateDisplay(newValue, updateText) {
-    // TODO: implement length checking here.
     // Convert length value to a string of maximum MAX_LENGTH characters.
     
-    // Deal with case > MAX_DISPLAY value allows.
+    // Deal with very long integers.
     // If number reaches more than MAX_DISPLAY digits, show the result
     // in scientific notation and disable all buttons except "clear".
     if (parseFloat(newValue) > 10 ** MAX_DISPLAY - 1) {
@@ -98,19 +104,15 @@ function updateDisplay(newValue, updateText) {
         buttonsNotClear.forEach((button) => button.disabled = true);
     } else {
         // Deal with rounding.
-        /*
-        Convert to string
-        If it has a decimal point
-            Split into before and after
-            Length of lenBefore and lenAfter
-            parseFloat(num).toFixed(Math.min(MAX_LENGTH - lenBefore, lenAfter))
-        */
+        // If the number has a decimal point, round it to the maximum number
+        // of digits in the display, or the current number of digits, whichever
+        // is smaller.
         newValue = '' + newValue;
-        const re = /^[0-9]+.{1}[0-9]+$/;
+        const re = /^[0-9]+\.[0-9]+$/;
         if (re.test(newValue)) {
             let decimalArray = newValue.split(".");
-            beforeDecimal = decimalArray[0];
-            afterDecimal = decimalArray[1];
+            let beforeDecimal = decimalArray[0];
+            let afterDecimal = decimalArray[1];
             
             let lenBefore = 0;
             let lenAfter = 0;
@@ -120,10 +122,12 @@ function updateDisplay(newValue, updateText) {
             newValue = parseFloat(newValue).toFixed(Math.min(MAX_DISPLAY - lenBefore, lenAfter));
         }
     }
-
+    // Update the display variable
     displayValue = '' + newValue;
 
+    // If required, update the display to reflect the new value.
     if (updateText == true) {
+        //TODO: add minus box and minus handling so always 8 digits.
         display.innerText = (displayValue == '' ? 0 : displayValue);
     }
     return displayValue;
@@ -131,6 +135,8 @@ function updateDisplay(newValue, updateText) {
 
 
 function operate(a, op, b) {
+    // Call an appropriate function based on the operator.
+
     switch(op) {
         case '+':
             return add(a, b);
