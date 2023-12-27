@@ -10,38 +10,62 @@ const display = document.querySelector(".display");
 const sign = document.querySelector(".sign");
 const buttonsNotClear = document.querySelectorAll("button:not(.clear)");
 
+document.addEventListener('keydown', (event) => handleKeyPress(event));
+
+function handleKeyPress(event) {
+    const key = event.key;
+    // Number keys
+    if (!isNaN(key)) {
+        numberPress(key);
+    } else if (key === '/' || key === '*' || key === '-' || key === '+') {
+        operatorPress(key);
+    } else if (key === 'Enter') {
+        equalsPress();
+    } else if (key === 'Escape') {
+        clearPress();
+    } else if (key === '%') {
+        percentPress();
+    } else if (key === 'p') {
+        toggleSignPress();
+    } else if (key === '.') {
+        decimalPress();
+    }
+}
+
 const btnNumbers = document.querySelectorAll("button.number");
-btnNumbers.forEach ((btn) => {
-    btn.addEventListener('click', () => {
-        // When a number is clicked, add it to the display variable and update the display.
-        // If the displayValue string is already at maximum size, do nothing.
-        if (equalsLastPressed == true) updateDisplay('', true);
-        equalsLastPressed = false;
-        console.log(typeof displayValue);
-        console.log(displayValue);
-        if (displayValue.replaceAll('-', '').length < MAX_DISPLAY) {
-            updateDisplay(displayValue + btn.value, true);
-        }
-    });
-});
+btnNumbers.forEach ((btn) => btn.addEventListener('click', () => numberPress(btn.value)));
+
+function numberPress(value) {
+    // When a number is clicked, add it to the display variable and update the display.
+    // If the displayValue string is already at maximum size, do nothing.
+    if (equalsLastPressed == true) updateDisplay('', true);
+    equalsLastPressed = false;
+    console.log(typeof displayValue);
+    console.log(displayValue);
+    if (displayValue.replaceAll('-', '').length < MAX_DISPLAY) {
+        updateDisplay(displayValue + value, true);
+    }
+}
 
 
 const btnOperators = document.querySelectorAll("button.operator");
-btnOperators.forEach ((btn) => {
-    btn.addEventListener('click', () => {
-        // When an operator is clicked, store the display in firstNumber and store the operator.
-        // Clear the displayValue string but do not update the display itself yet, so the
-        // user can see what value is being used for firstNumber.
-        equalsLastPressed = false;
-        firstNumber = displayValue;
-        operator = btn.value;
-        updateDisplay('', false);
-    });
-});
+btnOperators.forEach ((btn) => btn.addEventListener('click', () => operatorPress(btn.value)));
+
+function operatorPress(value) {
+    // When an operator is clicked, store the display in firstNumber and store the operator.
+    // Clear the displayValue string but do not update the display itself yet, so the
+    // user can see what value is being used for firstNumber.
+    equalsLastPressed = false;
+    firstNumber = displayValue;
+    operator = value;
+    updateDisplay('', false);
+}
 
 
 const btnEquals = document.querySelector("button.equals");
-btnEquals.addEventListener('click', () => {
+btnEquals.addEventListener('click', () => equalsPress());
+
+function equalsPress() {
     // When equals is clicked, store the current display as secondNumber.
     // Operate on the numbers, update the display and store the result in firstNumber.
     // Toggle 'equalsLastPressed' to allow repeated presses of equals with repeated operation.
@@ -57,48 +81,56 @@ btnEquals.addEventListener('click', () => {
         firstNumber = updateDisplay(operate(firstNumber, equalsCacheOperator, equalsCacheSecondNumber), true);
     }
     equalsLastPressed = true;
-});
+}
 
 
 const btnClear = document.querySelector("button.clear");
-btnClear.addEventListener('click', () => {
+btnClear.addEventListener('click', () => clearPress());
+
+function clearPress() {
     // Reset all numbers and clear display
     firstNumber = '';
     secondNumber = '';
     operator = '';
     buttonsNotClear.forEach((button) => button.disabled = false);
     updateDisplay('', true);
-})
+}
 
 
 const btnPercent = document.querySelector("button.percent");
-btnPercent.addEventListener('click', () => {
+btnPercent.addEventListener('click', () => percentPress());
+
+function percentPress() {
     // Convert the number from a % to a decimal, i.e. divide by 100 and round to
     // 2 dp.
     updateDisplay((Math.round((parseFloat(displayValue) / 100) * 100) / 100), true);
-})
+}
 
 
 const btnToggleSign = document.querySelector("button.toggle-sign");
-btnToggleSign.addEventListener('click', () => {
+btnToggleSign.addEventListener('click', () => toggleSignPress());
+
+function toggleSignPress() {
     if (displayValue !== 0 && displayValue !== '') {
         updateDisplay((parseFloat(displayValue) * -1), true);
     }
-    
-})
+}
 
 
 const btnDecimal = document.querySelector("button.decimal");
-btnDecimal.addEventListener('click', function() {
+btnDecimal.addEventListener('click', () => decimalPress());
+
+function decimalPress() {
     // If the display doesn't already include a '.', and isn't too long, add a decimal point.
     if (!displayValue.includes(".") && displayValue.length < MAX_DISPLAY - 1) {
         updateDisplay(displayValue + this.value, true);
     }
-})
+}
+
 
 function updateDisplay(newValue, updateText) {
     // Convert length value to a string of maximum MAX_LENGTH characters.
-    
+    //    
     // Deal with very long integers.
     // If number reaches more than MAX_DISPLAY digits, show the result
     // in scientific notation and disable all buttons except "clear".
@@ -164,6 +196,7 @@ function operate(a, op, b) {
             return a;
     }
 }
+
 
 function add(a, b) {
     return parseFloat(a) + parseFloat(b);
