@@ -1,3 +1,4 @@
+// Initialise variables and constants
 let firstNumber = '';
 let secondNumber = '';
 let operator = '';
@@ -9,8 +10,10 @@ let keyboardEnabled = true;
 const MAX_DISPLAY = 8;
 const display = document.querySelector(".display");
 const sign = document.querySelector(".sign");
+// Select all buttons except the AC button, for use in disabling / enabling the keys.
 const buttonsNotClear = document.querySelectorAll("button:not(.clear)");
 
+// Keyboard support
 document.addEventListener('keydown', (event) => handleKeyPress(event));
 
 function handleKeyPress(event) {
@@ -18,26 +21,30 @@ function handleKeyPress(event) {
     // Number keys
     if (!isNaN(key) && keyboardEnabled) {
         numberPress(key);
+    // Other keys...
     } else if ((key === '/' || key === '*' || key === '-' || key === '+') && keyboardEnabled) {
         operatorPress(key);
     } else if (key === 'Enter' && keyboardEnabled) {
         equalsPress();
-    } else if (key === 'Escape') {
-        clearPress();
     } else if (key === '%' && keyboardEnabled) {
         percentPress();
     } else if (key === 'p' && keyboardEnabled) {
         toggleSignPress();
     } else if (key === '.' && keyboardEnabled) {
         decimalPress();
+    // Escape is always enabled
+    } else if (key === 'Escape') {
+        clearPress();
     }
 }
+
 
 const btnNumbers = document.querySelectorAll("button.number");
 btnNumbers.forEach ((btn) => btn.addEventListener('click', () => numberPress(btn.value)));
 
 function numberPress(value) {
     // When a number is clicked, add it to the display variable and update the display.
+    // If the last button pressed was equals, complete the update of the display.
     // If the displayValue string is already at maximum size, do nothing.
     if (equalsLastPressed == true) updateDisplay('', true);
     equalsLastPressed = false;
@@ -89,11 +96,12 @@ const btnClear = document.querySelector("button.clear");
 btnClear.addEventListener('click', () => clearPress());
 
 function clearPress() {
-    // Reset all numbers and clear display
+    // Reset all numbers and clear display. Re-enable keyboard and button input.
     firstNumber = '';
     secondNumber = '';
     operator = '';
     buttonsNotClear.forEach((button) => button.disabled = false);
+    equalsLastPressed = false;
     keyboardEnabled = true;
     updateDisplay('', true);
 }
@@ -105,6 +113,7 @@ btnPercent.addEventListener('click', () => percentPress());
 function percentPress() {
     // Convert the number from a % to a decimal, i.e. divide by 100 and round to
     // 2 dp.
+    equalsLastPressed = false;
     updateDisplay((Math.round((parseFloat(displayValue) / 100) * 100) / 100), true);
 }
 
@@ -113,6 +122,8 @@ const btnToggleSign = document.querySelector("button.toggle-sign");
 btnToggleSign.addEventListener('click', () => toggleSignPress());
 
 function toggleSignPress() {
+    // If the display is not 0 or empty, toggle its sign from plus to minus.
+    equalsLastPressed = false;
     if (displayValue !== 0 && displayValue !== '') {
         updateDisplay((parseFloat(displayValue) * -1), true);
     }
@@ -124,6 +135,7 @@ btnDecimal.addEventListener('click', () => decimalPress());
 
 function decimalPress() {
     // If the display doesn't already include a '.', and isn't too long, add a decimal point.
+    equalsLastPressed = false;
     if (!displayValue.includes(".") && displayValue.length < MAX_DISPLAY - 1) {
         updateDisplay(displayValue + this.value, true);
     }
@@ -131,11 +143,12 @@ function decimalPress() {
 
 
 function updateDisplay(newValue, updateText) {
-    // Convert length value to a string of maximum MAX_LENGTH characters.
+    // Convert length value to a string of maximum MAX_LENGTH characters, 
+    // incorporating rounding.
     //    
     // Deal with very long integers.
     // If number reaches more than MAX_DISPLAY digits, show the result
-    // in scientific notation and disable all buttons except "clear".
+    // in scientific notation and disable all buttons and keyboard except "clear".
     if (Math.abs(parseFloat(newValue)) > 10 ** MAX_DISPLAY - 1) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
