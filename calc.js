@@ -4,6 +4,7 @@ let operator = '';
 let displayValue = '';
 let signValue = '';
 let equalsLastPressed = false;
+let keyboardEnabled = true;
 
 const MAX_DISPLAY = 8;
 const display = document.querySelector(".display");
@@ -15,19 +16,19 @@ document.addEventListener('keydown', (event) => handleKeyPress(event));
 function handleKeyPress(event) {
     const key = event.key;
     // Number keys
-    if (!isNaN(key)) {
+    if (!isNaN(key) && keyboardEnabled) {
         numberPress(key);
-    } else if (key === '/' || key === '*' || key === '-' || key === '+') {
+    } else if ((key === '/' || key === '*' || key === '-' || key === '+') && keyboardEnabled) {
         operatorPress(key);
-    } else if (key === 'Enter') {
+    } else if (key === 'Enter' && keyboardEnabled) {
         equalsPress();
     } else if (key === 'Escape') {
         clearPress();
-    } else if (key === '%') {
+    } else if (key === '%' && keyboardEnabled) {
         percentPress();
-    } else if (key === 'p') {
+    } else if (key === 'p' && keyboardEnabled) {
         toggleSignPress();
-    } else if (key === '.') {
+    } else if (key === '.' && keyboardEnabled) {
         decimalPress();
     }
 }
@@ -93,6 +94,7 @@ function clearPress() {
     secondNumber = '';
     operator = '';
     buttonsNotClear.forEach((button) => button.disabled = false);
+    keyboardEnabled = true;
     updateDisplay('', true);
 }
 
@@ -137,9 +139,11 @@ function updateDisplay(newValue, updateText) {
     if (Math.abs(parseFloat(newValue)) > 10 ** MAX_DISPLAY - 1) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
+        keyboardEnabled = false;
     } else if (Math.abs(parseFloat(newValue)) < 10 ** ((-1 * MAX_DISPLAY) + 2) && Math.abs(parseFloat(newValue)) > 0) {
         newValue = newValue.toExponential(MAX_DISPLAY - 5);
         buttonsNotClear.forEach((button) => button.disabled = true);
+        keyboardEnabled = false;
     } else {
         // Deal with rounding.
         // If the number has a decimal point, round it to the maximum number
